@@ -12,15 +12,13 @@ stages:
 before_script:
   - mkdir -p ${GOPATH}/src/${GO_PROJECT}
   - mkdir -p ${CI_PROJECT_DIR}/${ARTIFACTS_DIR}
-  - go get github.com/tools/godep
   - cp -r ${CI_PROJECT_DIR}/* ${GOPATH}/src/${GO_PROJECT}/
   - cd ${GOPATH}/src/${GO_PROJECT}
 
 build-my-project:
   stage: build
   script:
-    - godep restore
-    - godep go build -o ${CI_PROJECT_DIR}/${ARTIFACTS_DIR}/${BIN_NAME}
+    - go build -o ${CI_PROJECT_DIR}/${ARTIFACTS_DIR}/${BIN_NAME}
   artifacts:
     paths:
       - ${ARTIFACTS_DIR}
@@ -28,5 +26,4 @@ build-my-project:
 test-my-project:
   stage: test
   script:
-    - godep restore
-    - godep go test -v -cover ./...
+    - go test -v -cover ./...
