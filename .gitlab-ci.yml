@@ -1,30 +1,28 @@
-image: golang:latest
+image: restra/golang-docker-gitlabci
 
 variables:
-  BIN_NAME: goFidoGo
-  ARTIFACTS_DIR: artifacts
-  GO_PROJECT: gitlab.com/automateEverything/goFidoGo
+  DOCKER_REPO: hub.docker.com
+  MAIN_IMAGE_NAME: weautomateeverything/gofidogo
+
+services:
+  - docker:dind
 
 stages:
   - build
-  - test
+  - upgrade
 
 before_script:
-  - mkdir -p ${GOPATH}/src/${GO_PROJECT}
-  - mkdir -p ${CI_PROJECT_DIR}/${ARTIFACTS_DIR}
-  - cp -r ${CI_PROJECT_DIR}/* ${GOPATH}/src/${GO_PROJECT}/
-  - cd ${GOPATH}/src/${GO_PROJECT}
-  - go get -v
+  - mkdir -p /go/src/gitlab.com/automateEverything/goFidoGo
+  - cp -r . /go/src/gitlab.com/automateEverything/goFidoGo
+  - cd /go/src/gitlab.com/automateEverything/goFidoGo
 
-build-my-project:
+build:
   stage: build
   script:
-    - go build -o ${CI_PROJECT_DIR}/${ARTIFACTS_DIR}/${BIN_NAME}
-  artifacts:
-    paths:
-      - ${ARTIFACTS_DIR}
-
-test-my-project:
-  stage: test
-  script:
-    - go test -v -cover ./...
+    - go get -v
+    - go build
+    - docker login -u weautomateeverything -p $DOCKER_PASSWORD $DOCKER_REPO
+    - docker build -t $DOCKER_REPO/$MAIN_IMAGE_NAME:latest .
+    - docker build -t $DOCKER_REPO/$MAIN_IMAGE_NAME:$CI_COMMIT_REF_NAME .
+    - docker push $DOCKER_REPO/$MAIN_IMAGE_NAME:latest
+    - docker push $DOCKER_REPO/$MAIN_IMAGE_NAME:$CI_COMMIT_REF_NAME
