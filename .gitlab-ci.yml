@@ -1,14 +1,27 @@
-image: gitlab/dind
-
+image: restra/golang-docker-gitlabci
 
 variables:
-  CONTAINER_TEST_IMAGE: hub.docker.com/weautomateeverything/goFidoGo:$CI_BUILD_REF_NAME
-  CONTAINER_RELEASE_IMAGE: hub.docker.com/weautomateeverything/goFidoGo:latest
+  MAIN_IMAGE_NAME: weautomateeverything/gofidogo
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - upgrade
 
 before_script:
-  - docker login -u weautomateeverything -p $DOCKER_PASSWORD hub.docker.com
+  - mkdir -p /go/src/gitlab.com/automateEverything/goFidoGo
+  - cp -r . /go/src/gitlab.com/automateEverything/goFidoGo
+  - cd /go/src/gitlab.com/automateEverything/goFidoGo
+
 build:
   stage: build
   script:
-  - docker run --rm -v "$(pwd):/src" -v /var/run/docker.sock:/var/run/docker.sock -e COMPRESS_BINARY=true centurylink/golang-builder $CONTAINER_TEST_IMAGE
-  - docker push $CONTAINER_TEST_IMAGE
+    - go get -v
+    - go build
+    - docker login -u weautomateeverything -p $DOCKER_PASSWORD
+    - docker build -t $MAIN_IMAGE_NAME:latest .
+    - docker build -t $MAIN_IMAGE_NAME:$CI_COMMIT_REF_NAME .
+    - docker push $MAIN_IMAGE_NAME:latest
+    - docker push $MAIN_IMAGE_NAME:$CI_COMMIT_REF_NAME
