@@ -30,10 +30,6 @@ func NewService(client remoteTelegramCommands.RemoteCommandClient) Service {
 		for true {
 			err := s.runTest()
 			if err != nil {
-				_, err = http.Post("http://"+os.Getenv("HAL")+"/api/alert/"+os.Getenv("GROUP"), "text/plain", strings.NewReader(err.Error()))
-				if err != nil {
-					log.Println(err.Error())
-				}
 				s.sendScreenshot()
 			}
 
@@ -71,31 +67,16 @@ func (s *service) runTest() (err error) {
 		item := node.FirstChild
 		count := 0
 		error := false
-		row := fidoRow{}
 		for item != nil {
 			if item.Data == "td" {
 				switch count {
-				case 0:
-					n := item.FirstChild.FirstChild
-					for _, a := range n.Attr {
-						switch a.Key {
-						case "value":
-							row.name = a.Val
-
-						}
-
-					}
 				case 1:
-					row.status = item.FirstChild.FirstChild.Data
 					error = error || !checkBgColor(item.Attr, "#CCFFCC")
 				case 2:
-					row.dsa = item.FirstChild.FirstChild.Data
 					error = error || !checkBgColor(item.Attr, "#CCFFCC")
 				case 3:
-					row.edsa = item.FirstChild.FirstChild.Data
 					error = error || !checkBgColor(item.Attr, "#CCFFCC")
 				case 4:
-					row.mxt = item.FirstChild.FirstChild.Data
 					error = error || !checkBgColor(item.Attr, "#CCFFCC")
 
 				}
@@ -104,7 +85,7 @@ func (s *service) runTest() (err error) {
 			item = item.NextSibling
 		}
 		if error {
-			s := fmt.Sprintf("*FIDO Issue Detected*\nName: %v \nStatus: %v \nDSA: %v\nEDSA: %v \nMax tasks: %v", row.name, row.status, row.dsa, row.edsa, row.mxt)
+			s := fmt.Sprintf("*FIDO Issue Detected*")
 			return errors.New(s)
 		}
 	}
@@ -179,13 +160,4 @@ func checkBgColor(attrs []html.Attribute, expected string) bool {
 		}
 	}
 	return false
-}
-
-type fidoRow struct {
-	name   string
-	status string
-	dsa    string
-	edsa   string
-	mxt    string
-	error  bool
 }
