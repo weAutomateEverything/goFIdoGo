@@ -1,0 +1,20 @@
+language: go
+go:
+- master
+
+env:
+  global:
+      - CGO_ENABLED=0
+addons:
+  artifacts: true
+sudo: false
+services:
+ - docker
+before_script:
+
+script:
+ - go test -coverprofile=c.out ./...
+ - go build
+
+after_success:
+  - bin/docker_push.sh

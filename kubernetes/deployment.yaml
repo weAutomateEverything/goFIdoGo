@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: fido
+  name: fido
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fido
+  template:
+    metadata:
+      labels:
+        app: fido
+    spec:
+      containers:
+      - image: weautomateeverything/gofidogo:latest
+        name: fido

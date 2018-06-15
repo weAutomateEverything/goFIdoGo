@@ -11,6 +11,9 @@ import (
 	"strings"
 	"log"
 	"github.com/pkg/errors"
+	"github.com/tebeka/selenium"
+	"os"
+	"encoding/base64"
 )
 
 func NewService() Service {
@@ -19,10 +22,11 @@ func NewService() Service {
 		for true {
 			err := s.runTest()
 			if err != nil {
-				_, err = http.Post("http://hal.go2hal/api/alert/2054274878", "text/plain", strings.NewReader(err.Error()))
+				_, err = http.Post("http://"+os.Getenv("HAL")+"/api/alert/"+os.Getenv("GROUP"), "text/plain", strings.NewReader(err.Error()))
 				if err != nil {
 					log.Println(err.Error())
 				}
+				s.sendScreenshot()
 			}
 
 			time.Sleep(1 * time.Minute)
@@ -90,12 +94,41 @@ func (s *service) runTest() (err error) {
 			}
 			item = item.NextSibling
 		}
-		if error {
-			s := fmt.Sprintf("*FIDO Issue Detected*\nName: %v \nStatus: %v \nDSA: %v\n,EDSA: %v \nMAx Tasts: %v", row.name, row.status, row.dsa, row.edsa, row.mxt)
-			return errors.New(s)
-		}
+		//if error {
+		s := fmt.Sprintf("*FIDO Issue Detected*\nName: %v \nStatus: %v \nDSA: %v\nEDSA: %v \nMax tasks: %v", row.name, row.status, row.dsa, row.edsa, row.mxt)
+		return errors.New(s)
+		//}
 	}
 	return nil
+
+}
+
+func (s *service) sendScreenshot() {
+	caps := selenium.Capabilities(map[string]interface{}{"browserName": "chrome"})
+	caps["chrome.switches"] = []string{"--ignore-certificate-errors"}
+	d, err := selenium.NewRemote(caps, os.Getenv("SELENIUM"))
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	err = d.Get("http://rc20.sbic.co.za:3073/cics/cwba/tsgweb02")
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	bytes, err := d.Screenshot()
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	_, err = http.Post("http://"+os.Getenv("HAL")+"/api/alert/"+os.Getenv("GROUP")+"/image", "text/plain", strings.NewReader(base64.StdEncoding.EncodeToString(bytes)))
+	if err != nil {
+		log.Println(err.Error())
+	}
+	d.Close()
 
 }
 

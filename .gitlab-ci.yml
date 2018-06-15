@@ -20,7 +20,7 @@ build:
   script:
     - go get -v
     - go build
-    - docker login -u weautomateeverything -p $DOCKER_PASSWORD
+    - docker login -u weautomateeverything -p $DOCKER_PASSWORD docker.com
     - docker build -t $MAIN_IMAGE_NAME:latest .
     - docker build -t $MAIN_IMAGE_NAME:$CI_COMMIT_REF_NAME .
     - docker push $MAIN_IMAGE_NAME:latest

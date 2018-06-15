@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gitlab.com/automateEverything/goFidoGo/monitor"
+	"github.com/weAutomateEverything/goFidoGo/monitor"
 	"os"
 	"os/signal"
 	"syscall"
