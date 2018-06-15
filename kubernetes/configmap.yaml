@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gofidogo
+  labels:
+    name: gofidogo
+data:
+  SELENIUM: http://selenium.card-devops/wd/hub
+  HAL: hal.go2hal
+  GROUP: "2054274878"
