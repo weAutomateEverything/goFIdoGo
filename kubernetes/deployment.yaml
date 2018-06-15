@@ -17,3 +17,6 @@ spec:
       containers:
       - image: weautomateeverything/gofidogo:latest
         name: fido
+        envFrom:
+        - configMapRef:
+            name: gofidogo
