@@ -94,10 +94,10 @@ func (s *service) runTest() (err error) {
 			}
 			item = item.NextSibling
 		}
-		//if error {
-		s := fmt.Sprintf("*FIDO Issue Detected*\nName: %v \nStatus: %v \nDSA: %v\nEDSA: %v \nMax tasks: %v", row.name, row.status, row.dsa, row.edsa, row.mxt)
-		return errors.New(s)
-		//}
+		if error {
+			s := fmt.Sprintf("*FIDO Issue Detected*\nName: %v \nStatus: %v \nDSA: %v\nEDSA: %v \nMax tasks: %v", row.name, row.status, row.dsa, row.edsa, row.mxt)
+			return errors.New(s)
+		}
 	}
 	return nil
 
