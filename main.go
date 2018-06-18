@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/weAutomateEverything/go2hal/database"
 	"github.com/weAutomateEverything/go2hal/remoteTelegramCommands"
 	"github.com/weAutomateEverything/goFidoGo/monitor"
+	monitor2 "github.com/weAutomateEverything/prognosisHalBot/monitor"
 	"google.golang.org/grpc"
 	"log"
 	"os"
@@ -19,7 +21,12 @@ func main() {
 	}
 	c := remoteTelegramCommands.NewRemoteCommandClient(conn)
 	log.Println("GRPC Connection Done")
-	monitor.NewService(c)
+
+	db := database.NewConnection()
+
+	monitorStore := monitor2.NewMongoStore(db)
+
+	monitor.NewService(c, monitorStore)
 	log.Println("Service Started")
 	errs := make(chan error, 2)
 
