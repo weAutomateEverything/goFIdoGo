@@ -9,6 +9,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"github.com/weAutomateEverything/go2hal/database"
+	monitor2 "github.com/weAutomateEverything/prognosisHalBot/monitor"
 )
 
 func main() {
@@ -19,7 +21,12 @@ func main() {
 	}
 	c := remoteTelegramCommands.NewRemoteCommandClient(conn)
 	log.Println("GRPC Connection Done")
-	monitor.NewService(c)
+
+	db := database.NewConnection()
+
+	monitorStore := monitor2.NewMongoStore(db)
+
+	monitor.NewService(c,monitorStore)
 	log.Println("Service Started")
 	errs := make(chan error, 2)
 
