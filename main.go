@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
+	"github.com/weAutomateEverything/go2hal/database"
 	"github.com/weAutomateEverything/go2hal/remoteTelegramCommands"
 	"github.com/weAutomateEverything/goFidoGo/monitor"
+	monitor2 "github.com/weAutomateEverything/prognosisHalBot/monitor"
 	"google.golang.org/grpc"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"github.com/weAutomateEverything/go2hal/database"
-	monitor2 "github.com/weAutomateEverything/prognosisHalBot/monitor"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 
 	monitorStore := monitor2.NewMongoStore(db)
 
-	monitor.NewService(c,monitorStore)
+	monitor.NewService(c, monitorStore)
 	log.Println("Service Started")
 	errs := make(chan error, 2)
 
