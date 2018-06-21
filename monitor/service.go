@@ -3,10 +3,16 @@ package monitor
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"github.com/antchfx/htmlquery"
+	"github.com/ernesto-jimenez/httplogger"
+	"github.com/kyokomi/emoji"
 	"github.com/tebeka/selenium"
 	"github.com/weAutomateEverything/go2hal/remoteTelegramCommands"
+	"github.com/weAutomateEverything/prognosisHalBot/monitor"
 	"golang.org/x/net/html"
 	"io/ioutil"
 	"log"
@@ -14,12 +20,6 @@ import (
 	"os"
 	"strings"
 	"time"
-	"encoding/json"
-	"fmt"
-	"github.com/weAutomateEverything/prognosisHalBot/monitor"
-	"github.com/ernesto-jimenez/httplogger"
-	"crypto/tls"
-	"github.com/kyokomi/emoji"
 )
 
 func NewService(client remoteTelegramCommands.RemoteCommandClient, store monitor.Store) Service {
@@ -93,6 +93,14 @@ type callout struct {
 }
 
 func (s *service) runTest() {
+	t := time.Now()
+	//Do not monitor between 00:00 and 06:00 on a Sunday.
+	if t.Weekday() == time.Sunday {
+		if t.Hour() < 6 {
+			return
+		}
+	}
+
 	resp, err := http.Get(s.config.MonitorUrl)
 	if err != nil {
 		log.Println(err.Error())

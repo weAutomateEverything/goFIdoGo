@@ -15,8 +15,10 @@ spec:
         app: fido
     spec:
       containers:
-      - image: weautomateeverything/gofidogo:latest
+      - image: weautomateeverything/gofidogo:12.1
         name: fido
         envFrom:
         - configMapRef:
+            name: gofidogo
+        - secretRef:
             name: gofidogo

@@ -7,4 +7,10 @@ metadata:
 data:
   SELENIUM: http://selenium.card-devops/wd/hub
   HAL: hal.go2hal
-  GROUP: "2054274878"
+  MONGO_SERVERS: pchop85.standardbank.co.za:27017,pchop86.standardbank.co.za:27017,pchop87.standardbank.co.za:27017
+  MONGO_USER: chop
+  MONGO_REPLICA_SET: humongo
+  MONGO_AUTH_SOURCE: admin
+  MONGO_SSL: "0"
+  MONGO_DATABASE: fido
+  CONFIG_FILE: https://gitlab.standardbank.co.za/AutomateEverything/goFidoGo/raw/master/fido.json
