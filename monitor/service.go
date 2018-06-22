@@ -180,7 +180,15 @@ NodeLoop:
 			}
 
 			//Get the new error count
-			count, err = s.store.GetCount(row.name)
+			count, t, err = s.store.GetCount(row.name)
+
+			url := fmt.Sprintf("http://%v/api/alert/%v", os.Getenv("HAL"), group)
+			msg := fmt.Sprintf("Region %v has been in a error state for %v", row.name, time.Since(t).String())
+			_, err = http.Post(url, "text/plain", strings.NewReader(msg))
+			if err != nil {
+				log.Println(err.Error())
+			}
+
 			if err != nil {
 				log.Println(err.Error())
 				continue NodeLoop
@@ -213,11 +221,11 @@ NodeLoop:
 				continue NodeLoop
 			}
 
-			count, err = s.store.GetCount(row.name)
+			count, t, err = s.store.GetCount(row.name)
 			if count > 0 {
 				//Error count is > 0, so there were errors previously - lets tell the group everything is ok now.
 				url := fmt.Sprintf("http://%v/api/alert/%v", os.Getenv("HAL"), group)
-				msg := emoji.Sprintf(":white_check_mark: %v ok", row.name)
+				msg := emoji.Sprintf(":white_check_mark: %v ok. Total error time %v", row.name, time.Since(t).String())
 				http.Post(url, "text/plain", strings.NewReader(msg))
 				s.store.ZeroCount(row.name)
 			}
